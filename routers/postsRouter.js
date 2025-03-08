@@ -11,7 +11,7 @@ const controllers = require("../controllers/postsControllers")
 // index
 router.get("/", controllers.index)
 // show
-router.get("/:id", (req, res) => { res.json("rotta show") })
+router.get("/:id", controllers.show)
 router.post("/", (req, res) => { res.json("rotta store") })
 router.put("/:id", (req, res) => { res.json("rotta update") })
 router.patch("/:id", (req, res) => { res.json("rotta modify") })

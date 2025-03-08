@@ -18,11 +18,33 @@ function index(req, res) {
     })
 }
 
+// funzione show
+function show(req, res) {
+    // salviamo l'id
+    const id = req.params.id
+
+    // salviamo la query
+    const postSql = `
+       SELECT * 
+       FROM posts
+       WHERE id = ?
+    `
+
+    // tramite query ci troviamo il singolo post
+    connection.query(postSql, [id], (err, postResults) => {
+        if (err) return res.status(500).json({ error: "'Database query failed" });
+        if (postResults.length === 0) return res.status(404).json({ error: "post non trovato" });
+        res.json(postResults[0]);
+        console.log(postResults);
+
+    })
+}
+
 // funzione delete
 function destroy(req, res) {
 
     // prepariamo l'id
-    const { id } = req.params;
+    const id = req.params.id
 
     // prepariamo la qurey
     const postSql = `
@@ -40,4 +62,4 @@ function destroy(req, res) {
     })
 }
 
-module.exports = { index, destroy }
+module.exports = { index, destroy, show }
