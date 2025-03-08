@@ -18,4 +18,26 @@ function index(req, res) {
     })
 }
 
-module.exports = { index }
+// funzione delete
+function destroy(req, res) {
+
+    // prepariamo l'id
+    const { id } = req.params;
+
+    // prepariamo la qurey
+    const postSql = `
+       DELETE 
+       FROM posts
+       WHERE id = ?
+    `
+
+    // eliminiamo il post 
+    connection.query(postSql, [id], (err) => {
+        if (err) return res.status(500).json({ error: "failed to delete" });
+        if (err) return res.status(404).json({ error: "post non trovato" });
+
+        res.sendStatus(204);
+    })
+}
+
+module.exports = { index, destroy }
