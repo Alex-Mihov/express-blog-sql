@@ -4,6 +4,9 @@ const express = require("express");
 // importiamo router
 const router = express.Router();
 
+// importiamo il database
+const connection = require("../data/db")
+
 // rotte CRUD
 // index
 router.get("/", (req, res) => { res.json("rotta index") })
