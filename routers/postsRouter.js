@@ -4,12 +4,11 @@ const express = require("express");
 // importiamo router
 const router = express.Router();
 
-// importiamo il database
-const connection = require("../data/db")
+// importiamo i controller
+const controllers = require("../controllers/postsControllers")
 
 // rotte CRUD
-// index
-router.get("/", (req, res) => { res.json("rotta index") })
+router.get("/", controllers.index)
 router.get("/:id", (req, res) => { res.json("rotta show") })
 router.post("/", (req, res) => { res.json("rotta store") })
 router.put("/:id", (req, res) => { res.json("rotta update") })
