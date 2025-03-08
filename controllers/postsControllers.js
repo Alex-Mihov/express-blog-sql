@@ -60,6 +60,28 @@ function show(req, res) {
     })
 }
 
+// funzione create 
+function store(req, res) {
+
+    // 
+    const { title, content, image } = req.body;
+
+    // salviamo la query
+    const addPostSql = `
+    INSERT INTO posts(title, content, image)
+    VALUES (?, ?, ?)
+    `
+
+    connection.query(addPostSql, [title, content, image], (err, postResults) => {
+        if (err) return res.status(500).json({ error: "'Database query failed" });
+        if (postResults.length === 0) return res.status(404).json({ error: "post non trovato" });
+        res.json(postResults[0]);
+    })
+
+}
+
+// funzio
+
 // funzione delete
 function destroy(req, res) {
 
@@ -82,4 +104,4 @@ function destroy(req, res) {
     })
 }
 
-module.exports = { index, destroy, show }
+module.exports = { index, destroy, show, store }
