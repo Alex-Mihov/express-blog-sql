@@ -27,11 +27,15 @@ function show(req, res) {
     const id = parseInt(req.params.id); // Otteniamo l'ID del post dalla richiesta
 
     // Query per ottenere il post specifico
-    const postSql = `SELECT * FROM posts WHERE id = ?`;
+    const postSql = `
+    SELECT * 
+    FROM posts 
+    WHERE id = ?
+    `;
 
     // Query per ottenere i tag associati al post
     const tagSql = `
-        SELECT *
+        SELECT tags.label
         FROM tags
         JOIN post_tag ON tags.id = post_tag.tag_id
         WHERE post_id = ?
@@ -69,7 +73,10 @@ function store(req, res) {
     const { title, content, image } = req.body; // Estraiamo i dati dal body della richiesta
 
     // Query per inserire il nuovo post nel database
-    const addPostSql = `INSERT INTO posts(title, content, image) VALUES (?, ?, ?)`;
+    const addPostSql = `
+    INSERT INTO posts(title, content, image) 
+    VALUES (?, ?, ?)
+    `;
 
     // Eseguiamo la query per inserire il post
     connection.query(addPostSql, [title, content, image], (err, postResults) => {
@@ -82,34 +89,6 @@ function store(req, res) {
     });
 }
 
-// Funzione per aggiornare un post esistente
-function update(req, res) {
-    const id = parseInt(req.params.id); // Otteniamo l'ID del post dalla richiesta
-    const { title, content, image, label } = req.body; // Estraiamo i dati dal body
-
-    // Query per aggiornare il post e il tag associato
-    const updatePostSql = `
-        UPDATE posts
-        JOIN post_tag ON post_tag.post_id = posts.id
-        JOIN tags ON tags.id = post_tag.tag_id
-        SET posts.title = ?, posts.content = ?, posts.image = ?, tags.label = ?
-        WHERE posts.id = ? AND tags.label = ?
-    `;
-
-    // Eseguiamo la query per aggiornare il post
-    connection.query(updatePostSql, [title, content, image, label, id], (err, postResults) => {
-        if (err) {
-            // Se c'è un errore nella query, restituiamo un errore 500
-            return res.status(500).json({ error: "Database query failed" });
-        }
-        if (postResults.length === 0) {
-            // Se il post non esiste, restituiamo un errore 404
-            return res.status(404).json({ error: "Post non trovato" });
-        }
-        // Restituiamo il post aggiornato
-        res.json(postResults[0]);
-    });
-}
 
 // Funzione per eliminare un post
 function destroy(req, res) {
@@ -130,4 +109,4 @@ function destroy(req, res) {
 }
 
 // Esportiamo le funzioni per l'uso in altri file
-module.exports = { index, destroy, show, store, update };
+module.exports = { index, destroy, show, store };
