@@ -24,14 +24,34 @@ function show(req, res) {
     const id = req.params.id
 
     // salviamo la query
-    const postSql = `
-       SELECT * 
-       FROM posts
-       WHERE id = ?
+    // const postSql = `
+    //    SELECT * 
+    //    FROM posts
+    //    WHERE id = ?
+    // `
+
+
+    // salviamo la query di tags
+    const tagSql = `
+    SELECT *
+    FROM posts 
+    JOIN post_tag ON post_tag.post_id = posts.id
+    JOIN tags ON tags.id = post_tag.tag_id
+    WHERE posts.id = ?
     `
 
+
     // tramite query ci troviamo il singolo post
-    connection.query(postSql, [id], (err, postResults) => {
+    // connection.query(postSql, [id], (err, postResults) => {
+    //     if (err) return res.status(500).json({ error: "'Database query failed" });
+    //     if (postResults.length === 0) return res.status(404).json({ error: "post non trovato" });
+    //     res.json(postResults[0]);
+    //     console.log(postResults);
+
+    // })
+
+    // tramite query ci troviamo il singolo post con i tags
+    connection.query(tagSql, [id], (err, postResults) => {
         if (err) return res.status(500).json({ error: "'Database query failed" });
         if (postResults.length === 0) return res.status(404).json({ error: "post non trovato" });
         res.json(postResults[0]);
