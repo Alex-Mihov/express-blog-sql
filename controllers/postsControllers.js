@@ -21,7 +21,7 @@ function index(req, res) {
 // Funzione per ottenere un singolo post
 function show(req, res) {
     // Otteniamo l'ID del post dalla richiesta
-    const id = req.params.id
+    const id = parseInt(req.params.id)
 
     // Query per ottenere il singolo post
     const postSql = `
@@ -75,7 +75,7 @@ function store(req, res) {
 // Funzione per aggiornare un post esistente
 function update(req, res) {
     // Otteniamo l'ID del post dalla richiesta
-    const id = req.params.id
+    const id = parseInt(req.params.id)
 
     // Estraiamo i dati da aggiornare
     const { title, content, image, label } = req.body;
@@ -104,7 +104,7 @@ function update(req, res) {
 // Funzione per eliminare un post
 function destroy(req, res) {
     // Otteniamo l'ID del post dalla richiesta
-    const id = req.params.id
+    const id = parseInt(req.params.id)
 
     // Query per eliminare il post
     const deletePostSql = `
