@@ -1,0 +1,24 @@
+{
+  "name": "express-blog-sql",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js",
+    "watch": "node --watch server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Alex-Mihov/express-blog-sql.git"
+  },
+  "author": "Alex Mihov",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Alex-Mihov/express-blog-sql/issues"
+  },
+  "homepage": "https://github.com/Alex-Mihov/express-blog-sql#readme",
+  "description": "",
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+}
