@@ -1,28 +1,31 @@
-// Importiamo express per creare l'app
-const express = require('express')
-// Creiamo l'app Express
-const app = express()
-// Definiamo la porta su cui l'app ascolta (3000)
-const port = 3000
+// Importiamo il modulo Express per creare e gestire il server
+const express = require('express');
 
-// Importiamo il router per gestire le rotte dei post
+// Creiamo un'istanza dell'applicazione Express
+const app = express();
+
+// Definiamo la porta su cui il server sarà in ascolto
+const port = 3000;
+
+// Importiamo il router per gestire le rotte relative ai post
 const postsRouter = require("./routers/postsRouter");
 
-// Configuriamo express per leggere i dati in formato JSON nelle richieste
+// Configuriamo Express per analizzare le richieste con corpo in formato JSON
 app.use(express.json());
 
-// Configuriamo express per usare la cartella 'public' per i file statici (es. immagini, CSS, etc.)
+// Configuriamo Express per servire file statici dalla cartella "public" (es. immagini, CSS, JavaScript)
 app.use(express.static('public'));
 
-// Creiamo la rotta principale "/" che risponde con un messaggio
+// Definiamo la rotta principale "/" che risponde con un messaggio JSON
 app.get("/", (req, res) => {
-    res.json("rotta principaleeee")
-})
+    res.json("Benvenuto nella rotta principale!");
+});
 
-// Usiamo il router per le rotte che iniziano con "/posts"
-app.use("/posts", postsRouter)
+// Usiamo il router per tutte le richieste che iniziano con "/posts"
+app.use("/posts", postsRouter);
 
-// Avviamo il server sulla porta 3000
+// Avviamo il server e lo mettiamo in ascolto sulla porta specificata
 app.listen(port, () => {
-    console.log(`App in ascolto sulla porta ${port}`)
-})
+    console.log(`Server avviato e in ascolto sulla porta ${port}`);
+});
+

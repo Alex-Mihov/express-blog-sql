@@ -1,32 +1,33 @@
 // Importiamo Express
 const express = require("express");
 
-// Creiamo un'istanza di Router per definire le rotte
+// Creiamo un'istanza di Router per definire le rotte relative ai post
 const router = express.Router();
 
-// Importiamo i controller che gestiranno le richieste
-const controllers = require("../controllers/postsControllers")
+// Importiamo i controller che gestiranno le richieste per le operazioni sui post
+const controllers = require("../controllers/postsControllers");
 
-// Rotte per le operazioni CRUD
+// Definizione delle rotte per le operazioni CRUD sui post
 
-// Ottieni tutti i post (index)
-router.get("/", controllers.index)
+// Recupera tutti i post (GET /api/posts)
+router.get("/", controllers.index);
 
-// Ottieni un singolo post in base all'ID (show)
-router.get("/:id", controllers.show)
+// Recupera un singolo post in base all'ID (GET /api/posts/:id)
+router.get("/:id", controllers.show);
 
-// Crea un nuovo post (store)
-router.post("/", controllers.store)
+// Crea un nuovo post (POST /api/posts)
+router.post("/", controllers.store);
 
-// Modifica un post esistente (update) utilizzando l'ID
-router.put("/:id", controllers.update)
+// Aggiorna completamente un post esistente in base all'ID (PUT /api/posts/:id)
+router.put("/:id", controllers.update);
 
-// Modifica parziale un post (patch) - rotta di esempio
+// Aggiorna parzialmente un post esistente (PATCH /api/posts/:id) - Esempio di rotta
 router.patch("/:id", (req, res) => {
-    res.json("rotta modify")
-})
+    res.json("Rotta per modifica parziale di un post");
+});
 
-// Elimina un post in base all'ID (delete)
-router.delete("/:id", controllers.destroy)
+// Elimina un post in base all'ID (DELETE /api/posts/:id)
+router.delete("/:id", controllers.destroy);
 
+// Esportiamo il router per poterlo utilizzare in altre parti dell'app
 module.exports = router;
