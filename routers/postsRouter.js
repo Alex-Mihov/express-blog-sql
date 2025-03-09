@@ -19,12 +19,10 @@ router.get("/:id", controllers.show);
 router.post("/", controllers.store);
 
 // Aggiorna completamente un post esistente in base all'ID (PUT /api/posts/:id)
-// router.put("/:id", controllers.update);
+router.put("/:id", controllers.update);
 
 // Aggiorna parzialmente un post esistente (PATCH /api/posts/:id) - Esempio di rotta
-router.patch("/:id", (req, res) => {
-    res.json("Rotta per modifica parziale di un post");
-});
+router.patch("/:id", controllers.modify);
 
 // Elimina un post in base all'ID (DELETE /api/posts/:id)
 router.delete("/:id", controllers.destroy);

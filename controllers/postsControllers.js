@@ -89,6 +89,113 @@ function store(req, res) {
     });
 }
 
+function update(req, res) {
+    const id = parseInt(req.params.id);
+    const { title, content, image, tags } = req.body; // tags può contenere sia ID numerici che stringhe
+
+    // Query per aggiornare il post
+    const sqlUpdatePost = `
+        UPDATE posts 
+        SET title = ?, content = ?, image = ?
+        WHERE id = ?;
+    `
+
+
+    connection.query(sqlUpdatePost, [title, content, image, id], (err, result) => {
+        if (err) return res.status(500).json({ error: 'Database query failed' });
+        if (result.affectedRows === 0) return res.status(404).json({ error: 'Post non trovato' });
+
+        if (!tags || tags.length === 0) {
+            return res.json({ message: 'Post aggiornato con successo', id });
+        }
+        // Eliminare i vecchi tag associati al post
+        const sqlDeleteTags = 'DELETE FROM post_tag WHERE postid = ?';
+        connection.query(sqlDeleteTags, [id], (err) => {
+            if (err) return res.status(500).json({ error: 'Failed to update tags' });
+
+            // Separiamo i tag in ID esistenti e nuovi tag da creare
+            const existingTagIds = [];
+            const newTags = [];
+
+            tags.forEach(tag => {
+                if (typeof tag === 'number') {
+                    existingTagIds.push(tag); // È un ID, lo usiamo direttamente
+                } else if (typeof tag === 'string') {
+                    newTags.push(tag); // È un nuovo nome di tag, dobbiamo crearlo
+                }
+            });
+
+            // Se ci sono nuovi tag, li inseriamo
+            if (newTags.length > 0) {
+                const sqlInsertNewTags = 'INSERT INTO tags (label) VALUES ?';
+                const tagValues = newTags.map(tag => [tag]);
+
+                connection.query(sqlInsertNewTags, [tagValues], (err, result) => {
+                    if (err) return res.status(500).json({ error: 'Failed to insert new tags' });
+
+                    // Recuperiamo i nuovi ID generati
+                    const newTagIds = Array.from({ length: result.affectedRows }, (_, i) => result.insertId + i);
+
+                    // Combiniamo i nuovi tag con quelli già esistenti
+                    const allTagIds = [...existingTagIds, ...newTagIds];
+
+                    insertTagsIntoPost(id, allTagIds, res);
+                });
+            } else {
+                // Se non ci sono nuovi tag, usiamo solo quelli esistenti
+                insertTagsIntoPost(id, existingTagIds, res);
+            }
+        });
+    });
+}
+
+// Funzione per modificare un post senza gestire i tag
+function modify(req, res) {
+    // Recuperiamo l'ID del post dalla URL (parametri della richiesta)
+    const id = parseInt(req.params.id); // Convertiamo l'ID del post in un numero intero
+
+    // Estraiamo il titolo, il contenuto e l'immagine dalla richiesta (body)
+    const { title, content, image } = req.body;
+
+    // Creiamo due array vuoti per raccogliere i campi da aggiornare e i relativi valori
+    const updateFields = [];
+    const updateValues = [];
+
+    // Verifichiamo se ciascun campo è definito nella richiesta e, in caso positivo, lo aggiungiamo
+    // alla lista dei campi da aggiornare con il rispettivo valore
+    if (title !== undefined) {
+        updateFields.push("title = ?"); // Aggiungiamo la colonna title nella query
+        updateValues.push(title); // Aggiungiamo il valore del title
+    }
+    if (content !== undefined) {
+        updateFields.push("content = ?"); // Aggiungiamo la colonna content nella query
+        updateValues.push(content); // Aggiungiamo il valore del content
+    }
+    if (image !== undefined) {
+        updateFields.push("image = ?"); // Aggiungiamo la colonna image nella query
+        updateValues.push(image); // Aggiungiamo il valore dell'image
+    }
+
+    // Se nessun campo è stato fornito da aggiornare, restituiamo un errore
+    if (updateFields.length === 0) {
+        return res.status(400).json({ error: "Nessun campo da aggiornare" }); // Rispondiamo con errore 400
+    }
+
+    // Creiamo la query SQL per aggiornare il post
+    const sqlUpdatePost = `UPDATE posts SET ${updateFields.join(", ")} WHERE id = ?`;
+    updateValues.push(id); // Aggiungiamo l'ID del post al valore finale da passare alla query
+
+    // Eseguiamo la query di aggiornamento sul database
+    connection.query(sqlUpdatePost, updateValues, (err, result) => {
+        // Se si verifica un errore durante la query, rispondiamo con errore 500
+        if (err) return res.status(500).json({ error: "Errore nella query al database" });
+        // Se il post con l'ID specificato non esiste (nessuna riga aggiornata), rispondiamo con errore 404
+        if (result.affectedRows === 0) return res.status(404).json({ error: "Post non trovato" });
+        // Se l'aggiornamento va a buon fine, restituiamo un messaggio di successo
+        res.json({ message: "Post aggiornato con successo", id });
+    });
+}
+
 
 // Funzione per eliminare un post
 function destroy(req, res) {
@@ -109,4 +216,4 @@ function destroy(req, res) {
 }
 
 // Esportiamo le funzioni per l'uso in altri file
-module.exports = { index, destroy, show, store };
+module.exports = { index, destroy, show, store, update, modify };
