@@ -3,69 +3,42 @@ const connection = require("../data/db");
 
 // Funzione per ottenere tutti i post con i rispettivi tag
 function index(req, res) {
-    // Query per ottenere tutti i post e i loro tag
-    const postSql = `
-        SELECT *
-        FROM posts
-        JOIN post_tag ON post_tag.post_id = posts.id
-        JOIN tags ON tags.id = post_tag.tag_id
-    `;
+    // prepariamo la query
+    const sql = 'SELECT * FROM posts'
 
-    // Eseguiamo la query per recuperare tutti i post
-    connection.query(postSql, (err, postResults) => {
-        if (err) {
-            // Se c'è un errore nella query, restituiamo un errore 500
-            return res.status(500).json({ error: "Database query failed" });
-        }
-        // Restituiamo i risultati della query in formato JSON
-        res.json(postResults);
+    // eseguiamo la query
+    connection.query(sql, (err, results) => {
+        if (err)
+            return res.status(500).json({ error: 'Database query failed' });
+
+        res.json(results);
     });
 }
 
 // Funzione per ottenere un singolo post con i suoi tag
 function show(req, res) {
-    const id = parseInt(req.params.id); // Otteniamo l'ID del post dalla richiesta
+    // recuperiamo l'id dall' URL e trasformiamolo in numero
+    const id = parseInt(req.params.id)
 
-    // Query per ottenere il post specifico
-    const postSql = `
-    SELECT * 
-    FROM posts 
-    WHERE id = ?
-    `;
+    // prepariamo la query
+    const sql = `
+    SELECT
+    posts.*,
+        (SELECT GROUP_CONCAT(tags.label SEPARATOR ', ')
+        FROM post_tag
+        JOIN tags ON post_tag.tag_id = tags.id
+        WHERE post_tag.post_id = posts.id) AS tags
+    FROM posts
+    WHERE posts.id = ?;
+    `
 
-    // Query per ottenere i tag associati al post
-    const tagSql = `
-        SELECT tags.label
-        FROM tags
-        JOIN post_tag ON tags.id = post_tag.tag_id
-        WHERE post_id = ?
-    `;
 
-    // Eseguiamo la query per ottenere il post
-    connection.query(postSql, [id], (err, postResults) => {
-        if (err) {
-            // Se c'è un errore nella query, restituiamo un errore 500
-            return res.status(500).json({ error: "Database query failed" });
-        }
-        if (postResults.length === 0) {
-            // Se il post non esiste, restituiamo un errore 404
-            return res.status(404).json({ error: "Post non trovato" });
-        }
-
-        const post = postResults[0]; // Salviamo il post trovato
-
-        // Eseguiamo la query per ottenere i tag associati al post
-        connection.query(tagSql, [id], (err, tagsResults) => {
-            if (err) {
-                // Se c'è un errore nella query, restituiamo un errore 500
-                return res.status(500).json({ error: "Database query failed" });
-            }
-            // Assegniamo i tag al post
-            post.tags = tagsResults;
-            // Restituiamo il post con i suoi tag
-            res.json(post);
-        });
-    });
+    // eseguiamo la query per mostrare un singolo post
+    connection.query(sql, [id], (err, results) => {
+        if (err) return res.status(500).json({ error: 'Database query failed' })
+        if (results.length === 0) return res.status(404).json({ error: 'Post not found' })
+        res.json(results[0])
+    })
 }
 
 // Funzione per creare un nuovo post

@@ -19,6 +19,7 @@
   "homepage": "https://github.com/Alex-Mihov/express-blog-sql#readme",
   "description": "",
   "dependencies": {
+    "cors": "^2.8.5",
     "express": "^4.21.2",
     "mysql2": "^3.13.0"
   }

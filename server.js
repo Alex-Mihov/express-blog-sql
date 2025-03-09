@@ -1,6 +1,8 @@
 // Importiamo il modulo Express per creare e gestire il server
 const express = require('express');
 
+const cors = require("cors")
+
 // Creiamo un'istanza dell'applicazione Express
 const app = express();
 
@@ -10,8 +12,12 @@ const port = 3000;
 // Importiamo il router per gestire le rotte relative ai post
 const postsRouter = require("./routers/postsRouter");
 
+app.use(cors({ origin: "http://localhost:5173" }))
+
 // Configuriamo Express per analizzare le richieste con corpo in formato JSON
 app.use(express.json());
+
+
 
 // Configuriamo Express per servire file statici dalla cartella "public" (es. immagini, CSS, JavaScript)
 app.use(express.static('public'));
